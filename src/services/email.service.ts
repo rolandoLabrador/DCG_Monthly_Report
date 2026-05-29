@@ -18,8 +18,8 @@ export class EmailService {
             to: recipients,
           //  cc: CCrecipients,
             from: process.env.SENDER_EMAIL!,
-            subject: 'Capital Warranties Pending Contract Report',
-            text: `Hi,\n\nAttached is the list of pending Capital Warranties contracts up to today.\n\nThanks`,
+            subject: 'DCG Pending Contract Report',
+            text: `Hi,\n\nAttached is the list of DCG pending contracts up to today.\n\nThanks`,
             attachments: [{
         content: attachment,
         filename: fileName,
