@@ -17,6 +17,8 @@ jobs:
   build-and-send-report:
     
     if: github.ref == 'refs/heads/main'
+
+    environment: Main
     
     runs-on: ubuntu-latest
 
