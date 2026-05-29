@@ -52,6 +52,7 @@ async function main(){
     } catch (emailError) {
         console.error('Failed to send error email:', emailError);
     }
+    process.exit(1);
   } finally {
     await dbService.close();
   }
