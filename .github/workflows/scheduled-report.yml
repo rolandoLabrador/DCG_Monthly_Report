@@ -15,6 +15,9 @@ on:
 
 jobs:
   build-and-send-report:
+    
+    if: github.ref == 'refs/heads/main'
+    
     runs-on: ubuntu-latest
 
     steps:
