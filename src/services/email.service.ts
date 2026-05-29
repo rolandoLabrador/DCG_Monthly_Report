@@ -13,10 +13,9 @@ export class EmailService {
         const fileName = path.basename(filePath);
 
         const recipients = process.env.RECEIVER_EMAIL!.split(',');
-        const CCrecipients =process.env.CC_EMAIL!.split(',');
         const msg = {
             to: recipients,
-          //  cc: CCrecipients,
+            ...(process.env.CC_EMAIL ? { cc: process.env.CC_EMAIL.split(',').map(e => e.trim()) } : {}),
             from: process.env.SENDER_EMAIL!,
             subject: 'DCG Pending Contract Report',
             text: `Hi,\n\nAttached is the list of DCG pending contracts up to today.\n\nThanks`,
