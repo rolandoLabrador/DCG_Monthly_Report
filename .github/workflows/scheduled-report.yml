@@ -33,7 +33,7 @@ jobs:
         run: npm install
 
       - name: Run report generator
-        run: npx ts-node src/index.ts
+        run: npm start
         env:
           NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'PRODUCTION' || 'DEV' }}
           MONGO_URI: ${{ secrets.MONGO_URI }}
