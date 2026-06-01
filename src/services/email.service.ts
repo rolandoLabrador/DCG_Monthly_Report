@@ -12,7 +12,7 @@ export class EmailService {
         const attachment = fs.readFileSync(filePath).toString("base64");
         const fileName = path.basename(filePath);
 
-        const recipients = process.env.RECEIVER_EMAIL!.split(',');
+        const recipients = process.env.RECEIVER_EMAIL!.split(',').map(e => e.trim());
         const msg = {
             to: recipients,
             ...(process.env.CC_EMAIL ? { cc: process.env.CC_EMAIL.split(',').map(e => e.trim()) } : {}),
@@ -27,14 +27,14 @@ export class EmailService {
       }],
     };
     
-    // Use sendMultiple so each person gets their own copy
-    await sgMail.sendMultiple(msg); 
+    // Use send() instead of sendMultiple() because sendMultiple does not support CCs
+    await sgMail.send(msg); 
 }
 
   // Ensure this is named 'sendError'
 async sendError(error: any) {
     // Split here too so everyone gets the error notification
-    const recipients = process.env.RECEIVER_EMAIL!.split(',');
+    const recipients = process.env.RECEIVER_EMAIL!.split(',').map(e => e.trim());
 
     const msg = {
       to: recipients,
@@ -43,7 +43,7 @@ async sendError(error: any) {
       text: `The automated export failed. Please check the logs.\n\nError: ${error.message}`,
     };
 
-    // Use sendMultiple here as well
-    await sgMail.sendMultiple(msg);
+    // Use send() here as well for consistency
+    await sgMail.send(msg);
   }
 }
