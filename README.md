@@ -1,6 +1,6 @@
 # DCG Monthly Report Generator
 
-This project is an automated Node.js and TypeScript application that generates and emails a periodic Excel report for pending Capital Warranties contracts. 
+This project is an automated Node.js and TypeScript application that generates and emails a periodic Excel report for pending DCG contracts. 
 
 It connects to a MongoDB database, extracts the relevant contract data, aggregates it by dealership and product coverage, and sends a formatted Excel spreadsheet via SendGrid. The process is fully automated using GitHub Actions.
 
