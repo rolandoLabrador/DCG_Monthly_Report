@@ -14,7 +14,7 @@ It connects to a MongoDB database, extracts the relevant contract data, aggregat
 
 ## Prerequisites
 
-- **Node.js** (v16 or higher recommended)
+- **Node.js** (v20.19.0 or higher required)
 - **MongoDB Atlas** account/cluster access
 - **SendGrid** API Key for email delivery
 
