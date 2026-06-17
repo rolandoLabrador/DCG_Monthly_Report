@@ -15,27 +15,30 @@ on:
 
 jobs:
   build-and-send-report:
-    
-    if: github.ref == 'refs/heads/main'
+    # Ensures this workflow only runs if executed against the main branch
+    if: github.ref_name == 'main'
+
+    # Connects directly to your GitHub environment named "Main"
+    environment: Main
     
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16' # Using a stable LTS version
+          node-version: '20' # Stable LTS version compatible with MongoDB v7.2
 
       - name: Install dependencies
         run: npm install
 
       - name: Run report generator
-        run: npx ts-node src/index.ts
+        run: npm start
         env:
-          NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'PRODUCTION' || 'DEV' }}
+          NODE_ENV: PRODUCTION
           MONGO_URI: ${{ secrets.MONGO_URI }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
           RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
