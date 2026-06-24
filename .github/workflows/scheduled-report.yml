@@ -15,22 +15,20 @@ on:
 
 jobs:
   build-and-send-report:
-    
-    if: github.ref == 'refs/heads/main'
-    
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '16' # Using a stable LTS version
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run report generator
         run: npx ts-node src/index.ts
