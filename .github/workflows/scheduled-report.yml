@@ -21,19 +21,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js v20
         uses: actions/setup-node@v4
         with:
-          node-version: '16' # Using a stable LTS version
+          # Node.js 20 is required for MongoDB driver v7.2+
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run report generator
-        run: npx ts-node src/index.ts
+        run: npm start
         env:
-          NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'PRODUCTION' || 'DEV' }}
+          NODE_ENV: PRODUCTION
           MONGO_URI: ${{ secrets.MONGO_URI }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
           RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
