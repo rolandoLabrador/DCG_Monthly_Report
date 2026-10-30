@@ -1,12 +1,10 @@
-import * as configDotenv from 'dotenv';
+import 'dotenv/config';
 import path from 'path';
 import { DatabaseService } from './services/mongo.service.js';
 import { ExcelService } from './services/excel.service.js';
 import { EmailService } from './services/email.service.js';
 import { PcmiService } from './services/pcmi.service.js';
 import { transformContractData } from './utils/report.transformer.js';
-
-configDotenv.config();
 
 async function main(){
   // validate environment
@@ -23,8 +21,7 @@ async function main(){
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
-  const envLabel = (process.env.NODE_ENV || 'LOCAL').toUpperCase();
-  const fileName = `${year}-${month}-${day}-${envLabel}.xlsx`; 
+  const fileName = `${year}-${month}-${day}.xlsx`; 
   const filePath = path.join(process.cwd(), fileName);
 
   const dbService = new DatabaseService();
@@ -56,7 +53,7 @@ async function main(){
     await excelService.generateReport(reportData, filePath, discrepancies, pcmiStats);
 
     console.log('Sending email...');
-    await emailService.sendReport(filePath, process.env.RECEIVER_EMAIL!);
+    await emailService.sendReport(filePath, process.env.RECEIVER_EMAIL!, { pcmiStats });
 
     console.log('Process completed successfully!');
   } catch (error: any) {
@@ -66,10 +63,12 @@ async function main(){
     } catch (emailError) {
         console.error('Failed to send error email:', emailError);
     }
-    process.exit(1);
   } finally {
     await dbService.close();
   }
 }
 
-main();
+main().catch(error => {
+  console.error('Unhandled error during main execution:', error);
+  process.exitCode = 1;
+});
