@@ -3,21 +3,21 @@ import path from 'path';
 import { DatabaseService } from './services/mongo.service.js';
 import { ExcelService } from './services/excel.service.js';
 import { EmailService } from './services/email.service.js';
+import { PcmiService } from './services/pcmi.service.js';
 import { transformContractData } from './utils/report.transformer.js';
 
 configDotenv.config();
 
 async function main(){
-  // validate enviroment
-  const requiredEnvVars= ['MONGO_URI','SENDGRID_API_KEY','RECEIVER_EMAIL','SENDER_EMAIL'];
+  // validate environment
+  const requiredEnvVars = ['MONGO_URI','SENDGRID_API_KEY','RECEIVER_EMAIL','SENDER_EMAIL'];
   const missingVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
- if(missingVars.length>0){
+  if(missingVars.length > 0){
     console.error(`Missing required environment variables: ${missingVars.join(', ')}`);
     console.error('Please set these variables in your .env file or environment before running the application.');
     process.exit(1);
- }
-  console.log("TESTING ENV LOAD: ", process.env.FTP_HOST);
+  }
 
   const today = new Date();
   const year = today.getFullYear();
@@ -35,11 +35,25 @@ async function main(){
     console.log('Connecting to database and fetching contracts...');
     const contracts = await dbService.getContracts();
     
-    console.log(`Found ${contracts.length} pending contracts. Processing data...`);
-    const reportData = transformContractData(contracts);
+    console.log(`Found ${contracts.length} pending contracts in database.`);
+
+    let finalContracts = contracts;
+    let discrepancies: any[] = [];
+    let pcmiStats: any = undefined;
+
+    if (process.env.PCMI_CLIENT_ID && process.env.PCMI_CLIENT_SECRET) {
+      const pcmiService = new PcmiService();
+      const result = await pcmiService.filterPendingContracts(contracts);
+      finalContracts = result.pendingContracts;
+      discrepancies = result.removedContracts;
+      pcmiStats = result.stats;
+    }
+
+    console.log(`Processing verified report data for ${finalContracts.length} contracts...`);
+    const reportData = transformContractData(finalContracts);
 
     console.log(`Generating Excel report at ${filePath}...`);
-    await excelService.generateReport(reportData, filePath);
+    await excelService.generateReport(reportData, filePath, discrepancies, pcmiStats);
 
     console.log('Sending email...');
     await emailService.sendReport(filePath, process.env.RECEIVER_EMAIL!);
